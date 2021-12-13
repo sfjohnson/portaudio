@@ -1,0 +1,52 @@
+name: Build Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-macos:
+    runs-on: macos-10.15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Configure and make
+        run: |
+          ./configure
+          make
+          zip -r include.zip include
+
+      - name: Rename build output
+        run: mv lib/.libs/libportaudio.a libportaudio-macos10.a
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-output-macos10
+          path: |
+            include.zip
+            libportaudio-macos10.a
+            LICENSE.txt
+
+  create-release:
+    runs-on: ubuntu-20.04
+    needs: [build-macos]
+    steps:
+      - name: Get build output macos10
+        uses: actions/download-artifact@v2
+        with:
+          name: build-output-macos10
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            include.zip
+            libportaudio-macos10.a
+            LICENSE.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
