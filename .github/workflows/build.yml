@@ -21,7 +21,9 @@ jobs:
 
       - name: Prepare output
         run: |
-          zip -r include.zip include
+          pushd include
+          zip -r ../include.zip .
+          popd
           mv lib/.libs/libportaudio.a libportaudio-macos10.a
           mv LICENSE.txt LICENSE
 
