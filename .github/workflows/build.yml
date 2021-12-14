@@ -18,10 +18,12 @@ jobs:
         run: |
           ./configure
           make
-          zip -r include.zip include
 
-      - name: Rename build output
-        run: mv lib/.libs/libportaudio.a libportaudio-macos10.a
+      - name: Prepare output
+        run: |
+          zip -r include.zip include
+          mv lib/.libs/libportaudio.a libportaudio-macos10.a
+          mv LICENSE.txt LICENSE
 
       - name: Upload build output
         uses: actions/upload-artifact@v2
@@ -30,7 +32,7 @@ jobs:
           path: |
             include.zip
             libportaudio-macos10.a
-            LICENSE.txt
+            LICENSE
 
   create-release:
     runs-on: ubuntu-20.04
@@ -47,6 +49,6 @@ jobs:
           files: |
             include.zip
             libportaudio-macos10.a
-            LICENSE.txt
+            LICENSE
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
